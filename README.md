@@ -27,7 +27,7 @@ Unlock shotgun
 🎵 Custom sound effects and background music
 
 🖼️ Screenshots
-Add screenshots here to showcase gameplay (optional)
+
 
 🔧 Requirements
 Python 3.7+
