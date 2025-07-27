@@ -94,6 +94,8 @@ big_font = pygame.font.SysFont("Arial", 60)
 player_health = 100
 game_over = False
 zombie_spawn_timer = 0
+bullet_damage = 1
+
 
 ZOMBIE_TYPES = [
     {"name": "normal", "speed": 1.2, "health": 1},
@@ -101,6 +103,9 @@ ZOMBIE_TYPES = [
     {"name": "tank", "speed": 0.8, "health": 3},
     {"name": "boss", "speed": 0.5, "health": 10}
 ]
+
+last_boss_spawn_time = 0  # Track when the last boss was spawned
+
 
 #Create Shop options
 def generate_shop():
@@ -169,6 +174,23 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        elif event.type == pygame.MOUSEBUTTONDOWN and in_shop:
+            mouse_pos = pygame.mouse.get_pos()
+
+            # Buy Health
+            if health_button.collidepoint(mouse_pos) and coins >= 10:
+                player_health += 20
+                coins -= 10
+
+            # Buy Speed
+            elif speed_button.collidepoint(mouse_pos) and coins >= 15:
+                player_speed += 1
+                coins -= 15
+
+            # Buy Bullet Power
+            elif bullet_button.collidepoint(mouse_pos) and coins >= 20:
+                bullet_damage += 1
+                coins -= 20
 
         # Fire Bullet
         if not game_over and event.type == pygame.KEYDOWN:
@@ -182,7 +204,7 @@ while running:
                     upgrade = shop_options[2]
                 elif event.key == pygame.K_4 and len(shop_options) > 3:
                     upgrade = shop_options[3]
-                elif event.key == pygame.K_SPACE:
+                elif event.key == pygame.K_ESCAPE:
                     in_shop = False
                     continue
 
@@ -252,12 +274,14 @@ while running:
             zombie_spawn_timer = 0
 
             #Boss Zombie spawn logic
-        if int(elapsed_time) % 30 == 0 and not any(z["type"] == "boss" for z in zombies):
+        # Boss Zombie spawn every 5 seconds
+        if time.time() - last_boss_spawn_time > 5 and not any(z["type"] == "boss" for z in zombies):
             boss = spawn_zombie()
             boss["type"] = "boss"
             boss["speed"] = 0.5
             boss["health"] = 10
             zombies.append(boss)
+            last_boss_spawn_time = time.time()
 
         # Power Ups
         powerup_timer += 1
@@ -290,7 +314,7 @@ while running:
                 zx, zy = zombie["pos"]
                 if abs(bx - zx) < 30 and abs(by - zy) < 30:
                     zombie_hit_sound.play()
-                    zombie["health"] -= 1
+                    zombie["health"] -= bullet_damage
                     if zombie["health"] <= 0:
                         coins += 5
                         splatters.append((zx + 25, zy + 25, time.time()))
@@ -426,7 +450,11 @@ while running:
             text = font.render(f"{i + 1}. {name} - {cost} coins", True, (255, 255, 255))
             win.blit(text, (160, y + 15))
 
-        exit_text = font.render("Press SPACE to Continue", True, (150, 150, 150))
+        health_button = pygame.draw.rect(win, (100, 200, 100), (250, 150, 300, 50))
+        speed_button = pygame.draw.rect(win, (100, 100, 200), (250, 250, 300, 50))
+        bullet_button = pygame.draw.rect(win, (200, 100, 100), (250, 350, 300, 50))
+
+        exit_text = font.render("Press ESC to Continue", True, (150, 150, 150))
         win.blit(exit_text, (WIDTH // 2 - 140, HEIGHT - 60))
 
     pygame.display.update()
