@@ -13,7 +13,7 @@ A 2D top-down shooter game built using **Python** and **Pygame**, where you figh
   - Health refills  
   - Speed boost  
   - Faster fire rate  
-  - Unlock shotgun  
+  - Unlock different guns
 - 🎯 Bullet collision detection and splatter effects  
 - 🔄 Day/Night cycle  
 - ❤️ Powerups: Health and Speed Boost  
