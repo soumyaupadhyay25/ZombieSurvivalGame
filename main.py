@@ -96,6 +96,10 @@ game_over = False
 zombie_spawn_timer = 0
 bullet_damage = 1
 
+health_button = None
+speed_button = None
+bullet_button = None
+
 
 ZOMBIE_TYPES = [
     {"name": "normal", "speed": 1.2, "health": 1},
@@ -177,20 +181,17 @@ while running:
         elif event.type == pygame.MOUSEBUTTONDOWN and in_shop:
             mouse_pos = pygame.mouse.get_pos()
 
-            # Buy Health
-            if health_button.collidepoint(mouse_pos) and coins >= 10:
-                player_health += 20
+            if health_button and health_button.collidepoint(mouse_pos) and coins >= 10:
+                player_health += 10
                 coins -= 10
 
-            # Buy Speed
-            elif speed_button.collidepoint(mouse_pos) and coins >= 15:
+            if speed_button and speed_button.collidepoint(mouse_pos) and coins >= 10:
                 player_speed += 1
-                coins -= 15
+                coins -= 10
 
-            # Buy Bullet Power
-            elif bullet_button.collidepoint(mouse_pos) and coins >= 20:
+            if bullet_button and bullet_button.collidepoint(mouse_pos) and coins >= 10:
                 bullet_damage += 1
-                coins -= 20
+                coins -= 10
 
         # Fire Bullet
         if not game_over and event.type == pygame.KEYDOWN:
@@ -268,6 +269,12 @@ while running:
             shop_options = generate_shop()
             last_wave_time = time.time()
             wave_number += 1
+
+            # Initialize dummy buttons for mouse collision checks
+            health_button = pygame.Rect(150, 140, 500, 60)
+            speed_button = pygame.Rect(150, 220, 500, 60)
+            bullet_button = pygame.Rect(150, 300, 500, 60)
+
         spawn_interval = max(30, 90 - int(elapsed_time // 10))
         if zombie_spawn_timer >= 90:
             zombies.append(spawn_zombie())
@@ -450,9 +457,7 @@ while running:
             text = font.render(f"{i + 1}. {name} - {cost} coins", True, (255, 255, 255))
             win.blit(text, (160, y + 15))
 
-        health_button = pygame.draw.rect(win, (100, 200, 100), (250, 150, 300, 50))
-        speed_button = pygame.draw.rect(win, (100, 100, 200), (250, 250, 300, 50))
-        bullet_button = pygame.draw.rect(win, (200, 100, 100), (250, 350, 300, 50))
+
 
         exit_text = font.render("Press ESC to Continue", True, (150, 150, 150))
         win.blit(exit_text, (WIDTH // 2 - 140, HEIGHT - 60))
